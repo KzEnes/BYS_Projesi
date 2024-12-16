@@ -12,47 +12,47 @@ namespace VeriTabaniProjesi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class InstructorController : ControllerBase
+    public class CourseController : ControllerBase
     {
         private readonly ProjectContext _context;
 
-        public InstructorController(ProjectContext context)
+        public CourseController(ProjectContext context)
         {
             _context = context;
         }
 
-        // GET: api/Instructors
+        // GET: api/Course
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Instructor>>> Getinstructor()
+        public async Task<ActionResult<IEnumerable<Course>>> Getcourse()
         {
-            return await _context.instructor.ToListAsync();
+            return await _context.course.ToListAsync();
         }
 
-        // GET: api/Instructors/5
+        // GET: api/Course/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Instructor>> GetInstructor(int id)
+        public async Task<ActionResult<Course>> GetCourse(int id)
         {
-            var instructor = await _context.instructor.FindAsync(id);
+            var course = await _context.course.FindAsync(id);
 
-            if (instructor == null)
+            if (course == null)
             {
                 return NotFound();
             }
 
-            return instructor;
+            return course;
         }
 
-        // PUT: api/Instructors/5
+        // PUT: api/Course/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutInstructor(int id, Instructor instructor)
+        public async Task<IActionResult> PutCourse(int id, Course course)
         {
-            if (id != instructor.instructor_ID)
+            if (id != course.course_ID)
             {
                 return BadRequest();
             }
 
-            _context.Entry(instructor).State = EntityState.Modified;
+            _context.Entry(course).State = EntityState.Modified;
 
             try
             {
@@ -60,7 +60,7 @@ namespace VeriTabaniProjesi.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!InstructorExists(id))
+                if (!CourseExists(id))
                 {
                     return NotFound();
                 }
@@ -73,36 +73,35 @@ namespace VeriTabaniProjesi.Controllers
             return NoContent();
         }
 
-        // POST: api/Instructors
+        // POST: api/Course
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Instructor>> PostInstructor(Instructor instructor)
+        public async Task<ActionResult<Course>> PostCourse(Course course)
         {
-            _context.instructor.Add(instructor);
+            _context.course.Add(course);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetInstructor", new { id = instructor.instructor_ID }, instructor);
+            return CreatedAtAction("GetCourse", new { id = course.course_ID }, course);
         }
 
-        // DELETE: api/Instructors/5
+        // DELETE: api/Course/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteInstructor(int id)
+        public async Task<IActionResult> DeleteCourse(int id)
         {
-            var instructor = await _context.instructor.FindAsync(id);
-            if (instructor == null)
+            var course = await _context.course.FindAsync(id);
+            if (course == null)
             {
                 return NotFound();
             }
-
-            _context.instructor.Remove(instructor);
+            _context.course.Remove(course);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool InstructorExists(int id)
+        private bool CourseExists(int id)
         {
-            return _context.instructor.Any(e => e.instructor_ID == id);
+            return _context.course.Any(e => e.course_ID == id);
         }
     }
 }

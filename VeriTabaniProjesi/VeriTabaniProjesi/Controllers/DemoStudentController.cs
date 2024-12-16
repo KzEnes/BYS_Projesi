@@ -12,11 +12,11 @@ namespace VeriTabaniProjesi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class StudentController : ControllerBase
+    public class DemoStudentController : ControllerBase
     {
         private readonly ProjectContext _context;
 
-        public StudentController(ProjectContext context)
+        public DemoStudentController(ProjectContext context)
         {
             _context = context;
         }
