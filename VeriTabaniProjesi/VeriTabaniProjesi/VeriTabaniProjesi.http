@@ -1,6 +1,0 @@
-@VeriTabaniProjesi_HostAddress = http://localhost:5259
-
-GET {{VeriTabaniProjesi_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
