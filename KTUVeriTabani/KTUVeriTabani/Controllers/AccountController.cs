@@ -16,6 +16,7 @@ namespace SmartCourseSelectorWeb.Controllers
         }
 
         // GET: Login
+        [HttpGet]
         public IActionResult LoginUser()
         {
             return View();
