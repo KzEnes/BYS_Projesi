@@ -1,6 +1,6 @@
 using Microsoft.DotNet.Scaffolding.Shared.ProjectModel;
 using Microsoft.EntityFrameworkCore;
-using KTUVeriTabani.Context;
+using KTUVeriTabani.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 

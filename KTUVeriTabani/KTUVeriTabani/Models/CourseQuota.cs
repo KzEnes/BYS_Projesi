@@ -1,4 +1,4 @@
-﻿using SmartCourseSelectorWeb.Models;
+﻿using KTUVeriTabani.Models;
 using System.ComponentModel.DataAnnotations;
 
 namespace KTUVeriTabani.Models

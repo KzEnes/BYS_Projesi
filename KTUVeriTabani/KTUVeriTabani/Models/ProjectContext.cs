@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using KTUVeriTabani.Models;
 
-namespace KTUVeriTabani.Context
+namespace KTUVeriTabani.Models
 {
     public class ProjectContext : DbContext
     {

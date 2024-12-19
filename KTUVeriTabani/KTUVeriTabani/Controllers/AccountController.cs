@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using KTUVeriTabani.Models;
-using KTUVeriTabani.Context;
+
 
 namespace SmartCourseSelectorWeb.Controllers
 {
