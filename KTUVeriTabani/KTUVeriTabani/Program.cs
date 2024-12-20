@@ -40,6 +40,7 @@ app.MapControllerRoute(
     pattern: "{controller=Account}/{action=LoginUser}");
 
 // API route Postman uzerinden calismasi icin gerekli
+// API route Postman uzerinden calismasi icin gerekli
 app.MapControllers();
 
 app.UseSwagger();

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using KTUVeriTabani.Models;
 
 
-namespace SmartCourseSelectorWeb.Controllers
+namespace KTUVeriTabani.Controllers
 {
     [Route("api/StudentController")]
     [ApiController]

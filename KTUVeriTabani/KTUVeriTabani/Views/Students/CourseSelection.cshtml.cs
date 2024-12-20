@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace SmartCourseSelectorWeb.Views.Shared
+namespace KTUVeriTabani.Views.Shared
 {
     public class CourseSelectionModel : PageModel
     {
