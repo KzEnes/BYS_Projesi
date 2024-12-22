@@ -23,40 +23,29 @@ namespace KTUVeriTabani.Controllers
             var courses = _context.Courses.ToList();
             return View(courses);
         }
-        [HttpPost("SubmitSelectedCourses")]
-        public async Task<IActionResult> SubmitSelectedCourses(int id, List<int> selectedCourses)
-        {
-            
-            var student = await _context.Students
-                                         .Include(s => s.StudentCourseSelections)
-                                             .ThenInclude(sc => sc.Course)
-                                         .Include(s => s.Advisor)
-                                         .FirstOrDefaultAsync(s => s.StudentID == id);
-            // Yeni seçilen dersleri ekleyelim
-            foreach (var courseId in selectedCourses)
-            {
-                var courseSelection = new StudentCourseSelection
-                {
-                    StudentID = id,
-                    CourseID = courseId
-                };
 
-                _context.StudentCourseSelections.Add(courseSelection);
+        [HttpPost("SubmitSelectedCourses")]
+        public async Task<IActionResult> SubmitSelectedCourses([FromBody] SubmitCoursesRequest request)
+        {
+           
+
+            if (request == null || request.SelectedCourseIds == null || !request.SelectedCourseIds.Any())
+            {
+                return BadRequest("No courses selected.");
+            }
+            // İstekteki veriyi işleyin
+            foreach (var courseId in request.SelectedCourseIds)
+            {
+                // Örnek: Veritabanına kayıt işlemi
+                Console.WriteLine($"Student {request.StudentId} selected course {courseId}");
             }
 
-            // Değişiklikleri kaydet
-            await _context.SaveChangesAsync();
-            TempData["SuccessMessage"] = "Selection completed successfully!";
-
-            // Ana sayfaya yönlendirme
-            return NoContent();
+            return Ok(new { Message = "Courses submitted successfully!" });
         }
 
         [HttpGet("CourseSelection")]
         public async Task<IActionResult> CourseSelection(int id)
         {
-           
-           
             var student = await _context.Students
                                          .Include(s => s.StudentCourseSelections)
                                              .ThenInclude(sc => sc.Course)

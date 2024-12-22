@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace SmartCourseSelectorWeb.Views.Advisors
+namespace KTUVeriTabani.Views.Advisors
 {
     public class ViewStudentCoursesModel : PageModel
     {

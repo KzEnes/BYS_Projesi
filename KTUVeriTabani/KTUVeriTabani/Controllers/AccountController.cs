@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using KTUVeriTabani.Models;
 
-
 namespace KTUVeriTabani.Controllers
 {
     [Controller]
@@ -16,7 +15,6 @@ namespace KTUVeriTabani.Controllers
         }
 
         // GET: Login
-        [HttpGet]
         public IActionResult LoginUser()
         {
             return View();
