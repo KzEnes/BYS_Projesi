@@ -16,5 +16,6 @@ namespace KTUVeriTabani.Models
         public int? Quota { get; set; } 
 
         public ICollection<StudentCourseSelection> StudentCourseSelections { get; set; } = new List<StudentCourseSelection>();
+        public ICollection<UnapprovedSelections> UnapprovedSelections { get; set; } = new List<UnapprovedSelections>();
     }
 }

@@ -1,0 +1,196 @@
+﻿@model KTUVeriTabani.Models.Student
+
+@{
+    ViewData["Title"] = "Course Selection";
+}
+
+@* <link href="~/css/course-selection.css" rel="stylesheet" /> *@
+
+<style>
+    /* CSS tanımlarınızı buraya yazabilirsiniz */
+    .content-container {
+        background-color: #333;
+        color: white;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    table th {
+        background-color: #555;
+        color: #fff;
+    }
+
+    table tbody tr:hover {
+        background-color: #444;
+        color: white;
+    }
+
+    .btn-primary {
+        background-color: #28a745;
+        color: white;
+        padding: 12px 24px;
+    }
+
+        .btn-primary:hover {
+            background-color: #218838;
+        }
+</style>
+
+<div class="container content-container">
+    <a href="https://localhost:7199/Account/LoginUser" style="color:darkred" class="back-link">Logout</a>
+    <div class="student-info">
+        <h2>Course Selection</h2>
+        <h4>Student Information</h4>
+        <p><strong>Name:</strong> @Model.FirstName @Model.LastName</p>
+        <p><strong>Student ID:</strong> @Model.StudentID</p>
+        <p><strong>Department:</strong> @Model.Department</p>
+        <p><strong>Email:</strong> @Model.Email</p>
+        <p><strong>Enrollment Date:</strong> @Model.EnrollmentDate.ToString("d")</p>
+        <hr />
+        
+        @if (Model.Advisor != null)
+        {
+            <h4>Advisor Information</h4>
+            <p><strong>Name:</strong> @Model.Advisor.FullName</p>
+            <p><strong>Department:</strong> @Model.Advisor.Department</p>
+            <p><strong>Email:</strong> @Model.Advisor.Email</p>
+            <hr />
+        }
+        else
+        {
+            <p class="text-danger">Advisor information not available.</p>
+            <hr />
+        }
+    </div>
+
+    <button onclick="redirectToSelectCourses()">Select Courses</button>
+   
+   
+    
+
+
+</div>
+<script>
+       function redirectToSelectCourses() {
+        // @Model.StudentID'yi doğru şekilde yerleştiriyoruz
+        const studentId = '@Model.StudentID'; // Razor ifadesi burada çalışır
+
+        // URL'yi oluşturuyoruz
+        const url = `/api/StudentController/SelectCourses?StudentId=${encodeURIComponent(studentId)}`;
+
+        // Yönlendirme işlemi
+        window.location.href = url;
+    }
+</script> @if (Model.StudentCourseSelections == null || !Model.StudentCourseSelections.Any())
+{
+    <div class="alert alert-warning">
+        There is no any approved courses.
+    </div>
+}
+else
+{
+    <div class="table-container">
+        <form method="post" asp-action="SubmitCourseSelection" asp-controller="Students">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Course Name</th>
+                        <th>Mandatory</th>
+                        <th>Credit</th>
+                        <th>IsApproved</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var selection in Model.StudentCourseSelections)
+                    {
+                        <tr>
+                            <td>@selection.Course.CourseName</td>
+                            <td>@(selection.Course.IsMandatory ? "Mandatory" : "Elective")</td>
+                            <td>@selection.Course.Credit</td>
+                            <td>@(selection.IsApproved ? "Approved" : "-")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </form>
+        <div class="container content-container">
+
+
+            <div class="student-info">
+                <h2>Course Selection</h2>
+                <h4>Student Information</h4>
+                <p><strong>Name:</strong> @Model.FirstName @Model.LastName</p>
+                <p><strong>Student ID:</strong> @Model.StudentID</p>
+                <p><strong>Department:</strong> @Model.Department</p>
+                <p><strong>Email:</strong> @Model.Email</p>
+                <p><strong>Enrollment Date:</strong> @Model.EnrollmentDate.ToString("d")</p>
+                <hr />
+
+                @if (Model.Advisor != null)
+                {
+                    <h4>Advisor Information</h4>
+                    <p><strong>Name:</strong> @Model.Advisor.FullName</p>
+                    <p><strong>Department:</strong> @Model.Advisor.Department</p>
+                    <p><strong>Email:</strong> @Model.Advisor.Email</p>
+                    <hr />
+                }
+                else
+                {
+                    <div class="alert">
+                        Advisor information not available.
+                    </div>
+                }
+            </div>
+
+            <button class="btn" onclick="redirectToSelectCourses()">Select Courses</button>
+
+            @if (Model.StudentCourseSelections == null || !Model.StudentCourseSelections.Any())
+            {
+                <div class="alert">
+                    There are no approved courses.
+                </div>
+            }
+            else
+            {
+                <div class="table-container">
+                    <h4>Selected Courses</h4>
+                    <form method="post" asp-action="SubmitCourseSelection" asp-controller="Students">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Course Name</th>
+                                    <th>Mandatory</th>
+                                    <th>Credit</th>
+                                    <th>Approval Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var selection in Model.StudentCourseSelections)
+                                {
+                                    <tr>
+                                        <td>@selection.Course.CourseName</td>
+                                        <td>@(selection.Course.IsMandatory ? "Mandatory" : "Elective")</td>
+                                        <td>@selection.Course.Credit</td>
+                                        <td>@(selection.IsApproved ? "Approved" : "-")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </form>
+                </div>
+            }
+
+            <a href="LoginUser" class="back-link">Logout</a>
+        </div>
+
+        <script>
+            function redirectToSelectCourses() {
+                const studentId = '@Model.StudentID';
+                const url = `/api/StudentController/SelectCourses?StudentId=${encodeURIComponent(studentId)}`;
+                window.location.href = url;
+            }
+        </script>
+    </div>
+}
+

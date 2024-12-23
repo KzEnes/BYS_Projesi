@@ -1,6 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using KTUVeriTabani.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Build.Evaluation;
 using Microsoft.EntityFrameworkCore;
-using KTUVeriTabani.Models;
 
 namespace KTUVeriTabani.Controllers
 {
@@ -14,21 +15,26 @@ namespace KTUVeriTabani.Controllers
             _context = context;
         }
 
-        // GET: Login
+        // GET: Login sayfasını getirir
         public IActionResult LoginUser()
         {
             return View();
         }
 
-        // POST: Login
+        // POST: Login giriş bilgilerine göre yönlendirir
         [HttpPost("LoginUser")]
 
         public async Task<ActionResult> LoginUser(LoginViewModel model)
         {
+
             if (ModelState.IsValid)
             {
                 var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == model.Username && u.PasswordHash == model.Password && u.Role == model.Role);
 
+                if (model.Username == "admin" && model.Password == "123")
+                {
+                    return RedirectToAction("GetAdminWindow", "Admin");
+                }
                 if (user != null)
                 {
                     // Kullanıcı başarıyla giriş yaptı
@@ -49,7 +55,7 @@ namespace KTUVeriTabani.Controllers
             return View(model);
         }
 
-        // GET: ForgotPassword
+        // GET: ForgotPassword sayfasını getirir
         [HttpGet]
         public IActionResult ForgotPassword()
         {

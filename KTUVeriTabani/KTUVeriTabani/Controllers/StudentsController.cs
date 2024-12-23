@@ -17,53 +17,158 @@ namespace KTUVeriTabani.Controllers
         }
 
         [HttpGet("SelectCourses")]
-        public IActionResult SelectCourses()
+        public async Task<IActionResult> SelectCourses([FromQuery] int StudentId)
         {
-            // Tüm dersleri getiriyoruz
-            var courses = _context.Courses.ToList();
-            return View(courses);
+            if (StudentId == 0)
+            {
+                return BadRequest("Invalid student ID.");
+            }
+
+            var course = await _context.Courses.ToListAsync();
+            var student = await _context.Students
+                                       .Include(s => s.StudentCourseSelections)
+                                           .ThenInclude(sc => sc.Course)
+                                       .Include(s => s.Advisor)
+                                       .FirstOrDefaultAsync(s => s.StudentID == StudentId);
+
+            if (student == null)
+            {
+                return NotFound($"Student with ID {StudentId} not found.");
+            }
+
+            var sc = new StudentAndCourse
+            {
+                Course = course,
+                Student = student
+            };
+
+            return View(sc);
         }
+
 
         [HttpPost("SubmitSelectedCourses")]
         public async Task<IActionResult> SubmitSelectedCourses([FromBody] SubmitCoursesRequest request)
         {
-           
-
             if (request == null || request.SelectedCourseIds == null || !request.SelectedCourseIds.Any())
             {
                 return BadRequest("No courses selected.");
             }
-            // İstekteki veriyi işleyin
-            foreach (var courseId in request.SelectedCourseIds)
-            {
-                // Örnek: Veritabanına kayıt işlemi
-                Console.WriteLine($"Student {request.StudentId} selected course {courseId}");
-            }
 
-            return Ok(new { Message = "Courses submitted successfully!" });
+            try
+            {
+                // Öğrenciye ait mevcut kayıtları kontrol et ve sil
+                var existingRecords = _context.UnapprovedSelections
+                    .Where(x => x.StudentID == request.StudentId)
+                    .ToList();
+
+                if (existingRecords.Any())
+                {
+                    // Önceki derslerin kotasını arttır
+                    foreach (var record in existingRecords)
+                    {
+                        var course = await _context.Courses.FindAsync(record.CourseID);
+                        if (course != null)
+                        {
+                            course.Quota += 1; // Silinen dersin kotasını arttır
+                        }
+                    }
+
+                    _context.UnapprovedSelections.RemoveRange(existingRecords);
+                }
+
+                // Yeni kayıtları ekle
+                int maxId = _context.UnapprovedSelections.Any()
+                    ? _context.UnapprovedSelections.Max(x => x.ID)
+                    : 0;
+
+                foreach (var courseId in request.SelectedCourseIds)
+                {
+                    maxId++; // Yeni ID'yi belirle
+
+                    var unapprovedSelection = new UnapprovedSelections
+                    {
+                        ID = maxId,
+                        StudentID = request.StudentId,
+                        CourseID = courseId
+                    };
+
+                    // Yeni dersin kotasını azalt
+                    var course = await _context.Courses.FindAsync(courseId);
+                    if (course != null)
+                    {
+                        if (course.Quota > 0)
+                        {
+                            course.Quota -= 1; // Seçilen dersin kotasını azalt
+                        }
+                        else
+                        {
+                            return BadRequest($"The course {course.CourseName} is full and cannot be selected.");
+                        }
+                    }
+
+                    _context.UnapprovedSelections.Add(unapprovedSelection);
+                }
+
+                var existingStudentRecords = _context.StudentCourseSelections
+                                .Where(x => x.StudentID == request.StudentId)
+                                .ToList();
+
+                if (existingStudentRecords.Any())
+                {
+                    _context.StudentCourseSelections.RemoveRange(existingStudentRecords);
+                }
+
+                // Yeni seçilen dersleri ekle
+                foreach (var courseId in request.SelectedCourseIds)
+                {
+                    var studentCourseSelection = new StudentCourseSelection
+                    {
+                        StudentID = request.StudentId,
+                        CourseID = courseId,
+                        IsApproved = false,
+                        SelectionDate = DateTime.Now
+                    };
+
+                    _context.StudentCourseSelections.Add(studentCourseSelection);
+                }
+
+                // Değişiklikleri kaydet
+                await _context.SaveChangesAsync();
+
+                return Ok(new { Message = "Courses updated successfully!" });
+            }
+            catch (Exception ex)
+            {
+                // Hata durumunda geri bildirim ver
+                return StatusCode(500, new { Message = "An error occurred while updating courses.", Details = ex.Message });
+            }
         }
+
+
 
         [HttpGet("CourseSelection")]
         public async Task<IActionResult> CourseSelection(int id)
         {
+
             var student = await _context.Students
-                                         .Include(s => s.StudentCourseSelections)
-                                             .ThenInclude(sc => sc.Course)
-                                         .Include(s => s.Advisor) 
+                                         .Include(s => s.StudentCourseSelections) // Seçilen dersler
+                                             .ThenInclude(sc => sc.Course)       // Ders bilgileri
+                                         .Include(s => s.Advisor)                // Danışman bilgisi
+                                         .Include(s => s.UnapprovedSelections)   // Onaylanmamış dersler
+                                             .ThenInclude(us => us.Course)      // Ders bilgileri
                                          .FirstOrDefaultAsync(s => s.StudentID == id);
 
-
-            // Eğer öğrenci bulunamazsa hata mesajı gönderin
+            // Öğrenci bulunamadıysa hata mesajı gönder
             if (student == null)
             {
-                ViewBag.Message = "Student not found.";
-                return View(); // Boş bir View döner
+                return NotFound("Student not found.");
             }
 
-            // Öğrenci modelini View'a gönderin
-            return View(student); // Student modelini gönderiyoruz
+            // Öğrenci modelini View'a gönder
+            return View(student);
+
         }
-        
+
 
 
         // GET: api/Students

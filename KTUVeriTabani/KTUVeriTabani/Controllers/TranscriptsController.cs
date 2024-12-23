@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using KTUVeriTabani.Models;
 
-namespace StudentIMS.Controllers
+namespace KTUVeriTabani.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

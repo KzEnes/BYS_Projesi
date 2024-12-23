@@ -8,7 +8,119 @@
     .content-container {
         max-width: 75%;
     }
-   
+
+    .success-message {
+        color: green;
+        font-weight: bold;
+        margin-top: 20px;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    <style >
+    /* Genel Konteyner */
+    .container {
+        max-width: 80%;
+        margin: 20px auto;
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        font-family: 'Arial', sans-serif;
+    }
+
+    h2, h4 {
+        color: #343a40;
+    }
+
+    p {
+        font-size: 16px;
+        color: #495057;
+    }
+
+    /* Uyarı Mesajı */
+    .alert-warning {
+        background-color: #fff3cd;
+        border: 1px solid #ffeeba;
+        padding: 15px;
+        border-radius: 8px;
+        color: #856404;
+        font-weight: bold;
+        margin-top: 20px;
+    }
+
+    /* Tablo Stili */
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        background-color: white;
+        font-size: 16px;
+        color: #343a40;
+    }
+
+        .table th, .table td {
+            padding: 12px;
+            text-align: center;
+            border: 1px solid #dee2e6;
+        }
+
+        .table th {
+            background-color: #007bff;
+            color: white;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .table tbody tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        .table tbody tr:hover {
+            background-color: #e9ecef;
+            transition: background-color 0.3s ease;
+        }
+
+    /* Düğme Stili */
+    .btn-primary {
+        background-color: #28a745;
+        color: white;
+        padding: 10px 20px;
+        font-size: 14px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+        .btn-primary:hover {
+            background-color: #218838;
+            color: white;
+        }
+
+    /* Başarı Mesajı */
+    .success-message {
+        background-color: #d4edda;
+        border: 1px solid #c3e6cb;
+        padding: 15px;
+        border-radius: 8px;
+        color: #155724;
+        font-weight: bold;
+        margin-top: 20px;
+        display: none;
+    }
+
+        .success-message.hidden {
+            display: none;
+        }
+
+        .success-message.visible {
+            display: block;
+        }
+</style>
+
 </style>
 
 <div class="container">
@@ -22,33 +134,101 @@
 
     @if (Model.StudentCourseSelections == null || !Model.StudentCourseSelections.Any())
     {
-        <div class="alert alert-warning">
+        <div class="alert">
             No courses have been selected by this student.
         </div>
     }
     else
     {
         <h4>Selected Courses</h4>
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>Course Name</th>
-                    <th>Credit</th>
-                    <th>Mandatory</th>
-                    <th>Selection Date</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var courseSelection in Model.StudentCourseSelections)
-                {
+
+        <form asp-action="ApproveStudentsCourses" asp-controller="Advisors" method="post" id="approveForm">
+            <input type="hidden" name="id" value="@Model.AdvisorID" />
+            <table>
+                <thead>
                     <tr>
-                        <td>@courseSelection.Course.CourseName</td>
-                        <td>@courseSelection.Course.Credit</td>
-                        <td>@(courseSelection.Course.IsMandatory ? "Yes" : "No")</td>
-                        <td>@courseSelection.SelectionDate.ToString("d")</td>
+                        <th>Course Name</th>
+                        <th>Credit</th>
+                        <th>Mandatory</th>
+                        <th>Selection Date</th>
+                        <th>Approve?</th>
                     </tr>
-                }
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @foreach (var courseSelection in Model.StudentCourseSelections)
+                    {
+                        <tr>
+                            <td>@courseSelection.Course.CourseName</td>
+                            <td>@courseSelection.Course.Credit</td>
+                            <td>@(courseSelection.Course.IsMandatory ? "Yes" : "No")</td>
+                            <td>@courseSelection.SelectionDate.ToString("d")</td>
+                            <td>
+                                <input type="checkbox" name="SelectedCourseIds" value="@courseSelection.CourseID" @(courseSelection.IsApproved ? "checked" : "") />
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <div class="form-group">
+                <button type="submit" id="submitBtn" class="btn">Approve</button>
+            </div>
+        </form>
+        <a href="@Url.Action("ApproveCourses", "Advisors", new { id = Model.AdvisorID })" class="back-link">Back</a>
+
+        <div id="successMessage" class="success-message hidden">
+            Courses approved successfully!
+        </div>
     }
 </div>
+
+
+<script>
+
+
+    // Modify course IDs before submission and handle IsApproved for unchecked courses
+    document.getElementById("approveForm").onsubmit = function (event) {
+        // Collect all the checked checkboxes
+        var selectedCheckboxes = document.querySelectorAll('input[name="SelectedCourseIds"]:checked');
+
+        // Collect all unchecked checkboxes and handle their approval status
+        var uncheckedCheckboxes = document.querySelectorAll('input[name="SelectedCourseIds"]:not(:checked)');
+        uncheckedCheckboxes.forEach(function (checkbox) {
+            // Ensure that IsApproved for unchecked courses is set to false
+            var courseRow = checkbox.closest('tr');
+            var courseId = checkbox.value;
+
+            // Adding a hidden input field to mark IsApproved as false for unchecked courses
+            var isApprovedInput = document.createElement('input');
+            isApprovedInput.type = 'hidden';
+            isApprovedInput.name = 'UncheckedCourseIds'; // New list of unchecked course IDs
+            isApprovedInput.value = courseId + ":" + false;  // We are sending the course ID and approval status
+            courseRow.appendChild(isApprovedInput);
+        });
+
+        // You can now proceed with form submission, it will include the updated course IDs and approval status
+    }
+
+    // If the page reloads with success, show the success message
+
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Eğer success mesajı varsa göster
+        var successMessage = "@TempData["Success"]";
+        if (successMessage) {
+            showSuccessMessage();
+        }
+    });
+
+    function showSuccessMessage() {
+        var successMessageElement = document.getElementById("successMessage");
+        successMessageElement.classList.remove("hidden");
+        successMessageElement.textContent = "@TempData["Success"]";
+
+        // Hide the success message after 3 seconds
+        setTimeout(function () {
+            successMessageElement.classList.add("hidden");
+        }, 3000);
+    }
+
+</script>
