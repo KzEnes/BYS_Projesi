@@ -35,10 +35,40 @@
         .btn-primary:hover {
             background-color: #218838;
         }
+
+    .logout-button {
+        background-color: #dc3545;
+        color: white;
+        padding: 12px 24px;
+        text-decoration: none;
+        border-radius: 5px;
+        display: inline-block;
+        font-weight: bold;
+        text-align: center;
+        transition: background-color 0.3s ease;
+    }
+
+        .logout-button:hover {
+            background-color: #c82333;
+            text-decoration: none;
+            color: white;
+        }
+
+        .select-course{
+        background-color: limegreen;
+        color: white;
+        padding: 12px 24px;
+        text-decoration: none;
+        border-radius: 5px;
+        display: inline-block;
+        font-weight: bold;
+        text-align: center;
+        transition: background-color 0.3s ease;
+    }
 </style>
 
 <div class="container content-container">
-    <a href="https://localhost:7199/Account/LoginUser" style="color:darkred" class="back-link">Logout</a>
+   
     <div class="student-info">
         <h2>Course Selection</h2>
         <h4>Student Information</h4>
@@ -64,7 +94,8 @@
         }
     </div>
 
-    <button onclick="redirectToSelectCourses()">Select Courses</button>
+    <button class="select-course" onclick="redirectToSelectCourses()">Select Courses</button>
+    <a href="https://localhost:7000/" class="logout-button" style="color: darkred;">Logout</a>
    
    
     
@@ -181,7 +212,7 @@ else
                 </div>
             }
 
-            <a href="LoginUser" class="back-link">Logout</a>
+            
         </div>
 
         <script>
